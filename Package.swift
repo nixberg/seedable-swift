@@ -10,7 +10,8 @@ let package = Package(
             targets: ["Seedable"]),
     ],
     targets: [
-        .target(name: "Seedable"),
+        .target(
+            name: "Seedable"),
         .testTarget(
             name: "SeedableTests",
             dependencies: ["Seedable"]),

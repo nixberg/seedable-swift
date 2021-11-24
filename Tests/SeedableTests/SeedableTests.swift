@@ -41,7 +41,7 @@ final class SipTests: XCTestCase {
             0x09be110f767d8cee, 0xd61076dfc3569ab3, 0x8f6092dd2692af57, 0xbdf362ab8e29260b,
         ]
         
-        var rng = SipRNG(withInitialState: repeatElement(0, count: 32))
+        var rng = SipRNG(seededWith: repeatElement(0, count: 32))
         
         for vector in vectors {
             XCTAssertEqual(rng.next(), vector)
@@ -56,42 +56,51 @@ final class SipTests: XCTestCase {
             0x0dd6b8dd2abb4d8f, 0xb3bc3889e7142461, 0x062cbac703609d15, 0x74aec28d9fdd44bf,
         ]
         
-        var rng = SipRNG(withInitialState: (0..<32))
+        var rng = SipRNG(seededWith: (0..<32))
         
         for vector in vectors {
             XCTAssertEqual(rng.next(), vector)
         }
     }
     
-    func testSipRNGFromString() {
-        var seeder = SipRNG(seededWith: "test string")
-        var rng = SipRNG(withInitialState: (seeder.next(), seeder.next(), seeder.next(), seeder.next()))
+    func testMakeRNG() {
+        var seeder = SipRNG(hashing: "test string")
+        var rng = SipRNG(withInitialState: (
+            seeder.next(),
+            seeder.next(),
+            seeder.next(),
+            seeder.next()
+        ))
         XCTAssertEqual(rng.next(), 7267854722795183454)
         XCTAssertEqual(rng.next(), 0602994585684902144)
+        
+        rng = SipRNG(seededUsing: SipRNG(hashing: "test string"))
+        XCTAssertEqual(rng.next(), 7267854722795183454);
+        XCTAssertEqual(rng.next(), 0602994585684902144);
     }
     
     func testSipRNGZero() {
         var rng = SipRNG(withInitialState: (0, 0, 19, 0))
-        XCTAssertEqual(rng.next(), 0) // Not ideal.
+        XCTAssertEqual(rng.next(), 0)
     }
     
     func testSipRNGUIn8() {
-        var rng = SipRNG(withInitialState: repeatElement(0, count: 32))
+        var rng = SipRNG(seededWith: repeatElement(0, count: 32))
         XCTAssertEqual(rng.next() as UInt8, 42)
     }
     
     func testSipRNGUIn16() {
-        var rng = SipRNG(withInitialState: repeatElement(0, count: 32))
+        var rng = SipRNG(seededWith: repeatElement(0, count: 32))
         XCTAssertEqual(rng.next() as UInt16, 24618)
     }
     
     func testSipRNGUIn32() {
-        var rng = SipRNG(withInitialState: repeatElement(0, count: 32))
+        var rng = SipRNG(seededWith: repeatElement(0, count: 32))
         XCTAssertEqual(rng.next() as UInt32, 3226361898)
     }
     
     func testSipRNGUIn64() {
-        var rng = SipRNG(withInitialState: repeatElement(0, count: 32))
+        var rng = SipRNG(seededWith: repeatElement(0, count: 32))
         XCTAssertEqual(rng.next() as UInt64, 5476991012604633130)
     }
 }

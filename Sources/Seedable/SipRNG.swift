@@ -1,4 +1,6 @@
 public struct SipRNG: RandomNumberGenerator, Seedable {
+    public static var seedByteCount = 32
+    
     var state: State
     var adjustor: UInt64 = 0x13
     
@@ -6,28 +8,29 @@ public struct SipRNG: RandomNumberGenerator, Seedable {
         self.state = .init(v02: .init(state.v0, state.v2), v13: .init(state.v1, state.v3))
     }
     
-    public init<Bytes>(withInitialState bytes: Bytes)
-    where Bytes: Collection, Bytes.Element == UInt8 {
-        var bytes = bytes[...]
+    public init<Seed>(seededWith seed: Seed) where Seed: Collection, Seed.Element == UInt8 {
+        print(seed.count)
         
-        let v0 = UInt64(littleEndianBytes: bytes.prefix(8))
-        bytes = bytes.dropFirst(8)
-        let v1 = UInt64(littleEndianBytes: bytes.prefix(8))
-        bytes = bytes.dropFirst(8)
-        let v2 = UInt64(littleEndianBytes: bytes.prefix(8))
-        bytes = bytes.dropFirst(8)
-        let v3 = UInt64(littleEndianBytes: bytes.prefix(8))
-        bytes = bytes.dropFirst(8)
+        var seed = seed[...]
         
-        precondition(bytes.isEmpty)
+        let v0 = UInt64(littleEndianBytes: seed.prefix(8))
+        seed = seed.dropFirst(8)
+        let v1 = UInt64(littleEndianBytes: seed.prefix(8))
+        seed = seed.dropFirst(8)
+        let v2 = UInt64(littleEndianBytes: seed.prefix(8))
+        seed = seed.dropFirst(8)
+        let v3 = UInt64(littleEndianBytes: seed.prefix(8))
+        seed = seed.dropFirst(8)
+        
+        precondition(seed.isEmpty)
         
         self.init(withInitialState: (v0, v1, v2, v3))
     }
     
-    public init<S>(seededWith seed: S) where S: Seed {
+    public init<Value>(hashing value: Value) where Value: StablyHashable {
         var hasher: SipHash24 = .init(keys: (0, 0))
         
-        seed.hash(into: &hasher)
+        value.hash(into: &hasher)
         
         hasher.absorbTail()
         
