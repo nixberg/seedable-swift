@@ -30,7 +30,7 @@ extension Int: StablyHashable {
         withUnsafeBytes(of: littleEndian) {
             hasher.update(with: $0)
         }
-        hasher.update(with: repeatElement(0, count: (128 - Self.bitWidth) / 8))
+        hasher.update(with: repeatElement(self >= 0 ? 0 : ~0, count: (128 - Self.bitWidth) / 8))
     }
 }
 

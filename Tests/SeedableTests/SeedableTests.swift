@@ -75,8 +75,12 @@ final class SipTests: XCTestCase {
         XCTAssertEqual(rng.next(), 0602994585684902144)
         
         rng = SipRNG(seededUsing: SipRNG(hashing: "test string"))
-        XCTAssertEqual(rng.next(), 7267854722795183454);
-        XCTAssertEqual(rng.next(), 0602994585684902144);
+        XCTAssertEqual(rng.next(), 7267854722795183454)
+        XCTAssertEqual(rng.next(), 0602994585684902144)
+        
+        rng = SipRNG(seededUsing: SipRNG(hashing: -1))
+        XCTAssertEqual(rng.next(), 18092017109811415700)
+        XCTAssertEqual(rng.next(), 06068271683024885693)
     }
     
     func testSipRNGZero() {
